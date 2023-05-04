@@ -20,7 +20,7 @@ jobs:
             elixir: "1.14.4"
             lint: true
           - erlang: "24.2"
-            elixir: "1.13"
+            elixir: "1.14.2"
 
     steps:
       - uses: actions/checkout@v3

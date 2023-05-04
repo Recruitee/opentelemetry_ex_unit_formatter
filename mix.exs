@@ -10,7 +10,7 @@ defmodule OpentelemetryExUnitFormatter.MixProject do
       version: @version,
       name: "OpentelemetryExUnitFormatter",
       description: "Opentelemetry instrumentation for `ExUnit.Formatter`.",
-      elixir: "~> 1.10",
+      elixir: "~> 1.14.2",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       package: package(),
