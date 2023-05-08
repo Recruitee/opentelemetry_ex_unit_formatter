@@ -11,18 +11,24 @@ Opentelemetry instrumentation for `ExUnit.Formatter`.
 Telemetry handler that creates Opentelemetry spans from `ExUnit.Formatter` events.
 
 ## Installation
+
 Add `:opentelemetry_ex_unit_formatter` to your application dependencies list:
 
 ```elixir
 # mix.exs
-def deps do
+defp deps do
   [
-    {:opentelemetry_ex_unit_formatter, "~> 0.1.0", only: :test, runtime: false}
+    {
+      :opentelemetry_ex_unit_formatter,
+      "~> 0.1.0",
+      github: "Recruitee/opentelemetry_ex_unit_formatter", only: :test, runtime: false
+    }
   ]
 end
 ```
 
 ## Usage
+
 Add `OpentelemetryExUnitFormatter` to the `ExUnit` formatters list:
 
 ```elixir
@@ -38,9 +44,14 @@ dependencies list:
 
 ```elixir
 # mix.exs
-def deps do
+defp deps do
   [
-    {:opentelemetry_ex_unit_formatter, "~> 0.1.0", only: :test, runtime: false},
+    {
+      :opentelemetry_ex_unit_formatter,
+      "~> 0.1.0",
+      github: "Recruitee/opentelemetry_ex_unit_formatter", only: :test, runtime: false
+    },
+    {:opentelemetry, "~> 1.2"},
     {:opentelemetry_exporter, "~> 1.4", only: :test, runtime: false}
   ]
 end
@@ -50,10 +61,12 @@ Additionally you need to configure Opentelemetry tracer as described in the
 [:tracer_provider_config](#module-tracer_provider_config) section below.
 
 ## Configuration
+
 OpentelemetryExUnitFormatter configuration usually should be provided in the `config/test.exs` file.
 Available configuration options are described below.
 
 ### `:register_after_suite?`
+
 Opentelemetry processors might process telemetry spans asynchronously.
 After entire testing suite is completed by `ExUnit`, some spans might still be buffered by
 Opentelemetry processor and never exported.
@@ -69,17 +82,20 @@ consider registering your own callback depending on your Opentelemetry processor
 **Default:** `false`.
 
 ### `:root_attribute`
+
 Name of the root span attribute. By default it is set to the
 [Source Code Attribute](https://opentelemetry.io/docs/reference/specification/trace/semantic_conventions/span-general/#source-code-attributes).
 
 **Default:** `"code"`.
 
 ### `:span_name`
+
 Name of the emitted spans (see: `:otel_tracer_default.with_span/5`).
 
 **Default:** `"ex_unit"`.
 
 ### `:tracer_provider_config`
+
 To emit telemetry spans OpentelemetryExUnitFormatter will run its own tracer provider, independent
 of your application tracer defined in this case for the `:test` environment.
 
@@ -113,4 +129,5 @@ in the [`:register_after_suite?`](#module-register_after_suite) section.
 For debugging purposes `:opentelemetry_exporter` can be set to `:otel_exporter_stdout`.
 
 **Default:** `:none`.
+
 <!-- MDOC !-->
