@@ -43,7 +43,14 @@ defmodule OpentelemetryExUnitFormatter do
   end
 
   defp do_init(tracer_provider_config, config) do
-    {name, vsn, schema_url} = :opentelemetry.get_application(__MODULE__)
+    {name, vsn, schema_url} =
+      case :opentelemetry.get_application(__MODULE__) do
+        {name, vsn, schema_url} ->
+          {name, vsn, schema_url}
+
+        _undef ->
+          {Application.get_application(__MODULE__), Mix.Project.config()[:version], :undefined}
+      end
 
     case :otel_tracer_provider.get_tracer(__MODULE__, name, vsn, schema_url) do
       {:otel_tracer_noop, []} ->
