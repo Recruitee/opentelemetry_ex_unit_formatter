@@ -58,12 +58,41 @@ end
 ```
 
 Additionally you need to configure Opentelemetry tracer as described in the
-[:tracer_provider_config](#module-tracer_provider_config) section below.
+[:tracer_provider_config](#tracer_provider_config) section below.
 
 ## Configuration
 
 OpentelemetryExUnitFormatter configuration usually should be provided in the `config/test.exs` file.
 Available configuration options are described below.
+
+### `:before_send`
+
+User provided single arity anonymous function executed before starting and sending a new telemetry
+span.
+Function should accept span attributes map as an argument and should return user modified span
+attributes map.
+
+**Default:** `nil`.
+
+Example:
+
+```elixir
+# config/test.exs
+config :opentelemetry_ex_unit_formatter,
+  before_send: &MyApp.Test.Support.OpentelemetryExUnitFormatterHelper.before_send/1,
+
+# test/support/opentelemetry_ex_unit_formatter_helper.ex
+defmodule MyApp.Test.Support.OpentelemetryExUnitFormatterHelper do
+  @attr_prefix "code.ci"
+  @undefined "undefined"
+
+  def before_send(attributes) do
+    attributes
+    |> Map.put(:"#{@attr_prefix}.ref_name", System.get_env("GITHUB_REF_NAME", @undefined))
+    |> Map.put(:"#{@attr_prefix}.repository", System.get_env("GITHUB_REPOSITORY", @undefined))
+  end
+end
+```
 
 ### `:register_after_suite?`
 
@@ -124,7 +153,7 @@ config :opentelemetry_ex_unit_formatter,
 
 For large projects you might consider using `:otel_batch_processor`. When using batch processor, be
 aware that spans are batched before being processed and it requires special attention as discussed
-in the [`:register_after_suite?`](#module-register_after_suite) section.
+in the [`:register_after_suite?`](#register_after_suite) section.
 
 For debugging purposes `:opentelemetry_exporter` can be set to `:otel_exporter_stdout`.
 

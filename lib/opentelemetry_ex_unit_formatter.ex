@@ -1,16 +1,24 @@
 defmodule OpentelemetryExUnitFormatter do
+  @readme "README.md"
+          |> File.read!()
+          |> String.split("<!-- MDOC !-->")
+          |> Enum.fetch!(1)
+          |> String.replace("](#", "](#module-")
+
   @moduledoc """
-  #{File.read!("README.md") |> String.split("<!-- MDOC !-->") |> Enum.fetch!(1)}
+  #{@readme}
   """
 
   use GenServer
 
-  defstruct register_after_suite?: false,
+  defstruct before_send: nil,
+            register_after_suite?: false,
             root_attribute: "code",
             span_name: "ex_unit",
             tracer_provider_config: :none
 
   @type t() :: %__MODULE__{
+          before_send: (map() -> map()) | nil,
           register_after_suite?: boolean(),
           root_attribute: String.t(),
           span_name: :opentelemetry.span_name(),
@@ -187,6 +195,7 @@ defmodule OpentelemetryExUnitFormatter do
   defp normalize_state({state, reason}), do: {state, inspect(reason)}
 
   defp emit_span(%{duration: duration, event_type: span_type} = attributes, %{
+         before_send: before_send,
          partition_no: partition_no,
          root_attribute: root_attribute,
          seed: seed,
@@ -199,6 +208,11 @@ defmodule OpentelemetryExUnitFormatter do
     attributes = Map.put(attributes, :test_partition_no, partition_no)
     attributes = Map.put(attributes, :test_seed, seed)
     attributes = prefix_root_attribute(attributes, root_attribute)
+
+    attributes =
+      if is_function(before_send),
+        do: before_send.(attributes),
+        else: attributes
 
     start_time =
       :opentelemetry.timestamp() - :erlang.convert_time_unit(duration, :microsecond, :native)
