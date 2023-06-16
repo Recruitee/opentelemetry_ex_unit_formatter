@@ -18,11 +18,7 @@ Add `:opentelemetry_ex_unit_formatter` to your application dependencies list:
 # mix.exs
 defp deps do
   [
-    {
-      :opentelemetry_ex_unit_formatter,
-      "~> 0.1.0",
-      github: "Recruitee/opentelemetry_ex_unit_formatter", only: :test, runtime: false
-    }
+    {:opentelemetry_ex_unit_formatter, "~> 0.1.0"}
   ]
 end
 ```
